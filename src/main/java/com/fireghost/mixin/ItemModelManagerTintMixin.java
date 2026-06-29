@@ -44,6 +44,7 @@ public class ItemModelManagerTintMixin {
 		((LayerTintApplier) (Object) renderState).fireghost$applyTint(tint);
 
 		if (tint != 0) {
+			renderState.markAnimated();
 			renderState.addModelKey(tint);
 		}
 	}
