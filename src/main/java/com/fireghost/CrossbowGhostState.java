@@ -1,7 +1,6 @@
 package com.fireghost;
 
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.CrossbowItem;
 import net.minecraft.item.ItemStack;
@@ -13,21 +12,21 @@ public final class CrossbowGhostState {
 
 	private static final int GRACE_TICKS = 10;
 
-	private static int ghostSlot = -1;
+	private static ItemStack ghostStack = null;
+	private static ItemStack chargeStack = null;
 	private static long chargeStartTick = -1;
-	private static int chargeSlot = -1;
+	private static ItemStack pendingStack = null;
 	private static long pendingSince = -1;
-	private static int pendingSlot = -1;
 
 	private CrossbowGhostState() {
 	}
 
 	public static void reset() {
-		ghostSlot = -1;
+		ghostStack = null;
+		chargeStack = null;
 		chargeStartTick = -1;
-		chargeSlot = -1;
+		pendingStack = null;
 		pendingSince = -1;
-		pendingSlot = -1;
 	}
 
 	public static void tick(ClientPlayerEntity self, long now) {
@@ -37,55 +36,59 @@ public final class CrossbowGhostState {
 		}
 
 		PlayerInventory inv = self.getInventory();
-		int selected = inv.getSelectedSlot();
-		ItemStack main = self.getMainHandStack();
 		boolean usingCrossbow = self.isUsingItem() && self.getActiveItem().isOf(Items.CROSSBOW);
 
-		if (ghostSlot >= 0) {
-			ItemStack flagged = inv.getStack(ghostSlot);
-			if (!flagged.isOf(Items.CROSSBOW) || CrossbowItem.isCharged(flagged)) {
-				ghostSlot = -1;
-			}
+		if (ghostStack != null && !fireghost$isLiveGhost(inv)) {
+			ghostStack = null;
 		}
 
 		if (usingCrossbow) {
+			ItemStack active = self.getActiveItem();
 			if (chargeStartTick < 0) {
 				chargeStartTick = now;
-				chargeSlot = selected;
+				chargeStack = active;
 			}
-			int pull = CrossbowItem.getPullTime(self.getActiveItem(), self);
-			if (now - chargeStartTick > (long) pull + GRACE_TICKS && !CrossbowItem.isCharged(main)) {
-				ghostSlot = chargeSlot;
+			int pull = CrossbowItem.getPullTime(active, self);
+			if (now - chargeStartTick > (long) pull + GRACE_TICKS && !CrossbowItem.isCharged(active)) {
+				ghostStack = active;
 			}
 		} else {
 			if (chargeStartTick >= 0) {
-				ItemStack slotStack = inv.getStack(chargeSlot);
-				int pull = CrossbowItem.getPullTime(slotStack, self);
-				long held = now - chargeStartTick;
-				if (held >= pull && slotStack.isOf(Items.CROSSBOW) && !CrossbowItem.isCharged(slotStack)) {
-					pendingSlot = chargeSlot;
-					pendingSince = now;
+				if (chargeStack != null && chargeStack.isOf(Items.CROSSBOW) && !CrossbowItem.isCharged(chargeStack)) {
+					int pull = CrossbowItem.getPullTime(chargeStack, self);
+					if (now - chargeStartTick >= pull) {
+						pendingStack = chargeStack;
+						pendingSince = now;
+					}
 				}
 				chargeStartTick = -1;
-				chargeSlot = -1;
+				chargeStack = null;
 			}
 
-			if (pendingSlot >= 0) {
-				ItemStack slotStack = inv.getStack(pendingSlot);
-				if (!slotStack.isOf(Items.CROSSBOW) || CrossbowItem.isCharged(slotStack)) {
-					pendingSlot = -1;
+			if (pendingStack != null) {
+				if (!pendingStack.isOf(Items.CROSSBOW) || CrossbowItem.isCharged(pendingStack)) {
+					pendingStack = null;
 				} else if (now - pendingSince >= GRACE_TICKS) {
-					ghostSlot = pendingSlot;
-					pendingSlot = -1;
+					ghostStack = pendingStack;
+					pendingStack = null;
 				}
 			}
 		}
 	}
 
-	public static boolean isGhostStack(PlayerEntity player, ItemStack stack) {
-		if (ghostSlot < 0) {
+	private static boolean fireghost$isLiveGhost(PlayerInventory inv) {
+		if (ghostStack == null || ghostStack.isEmpty() || !ghostStack.isOf(Items.CROSSBOW) || CrossbowItem.isCharged(ghostStack)) {
 			return false;
 		}
-		return stack == player.getInventory().getStack(ghostSlot);
+		for (int i = 0; i < inv.size(); i++) {
+			if (inv.getStack(i) == ghostStack) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static boolean isGhostStack(ItemStack stack) {
+		return ghostStack != null && stack == ghostStack;
 	}
 }

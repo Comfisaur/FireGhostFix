@@ -3,10 +3,8 @@ package com.fireghost.mixin;
 import com.fireghost.CrossbowGhostState;
 import com.fireghost.FireGhostConfig;
 import com.fireghost.LayerTintApplier;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.item.ItemModelManager;
 import net.minecraft.client.render.item.ItemRenderState;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.CrossbowItem;
 import net.minecraft.item.ItemDisplayContext;
 import net.minecraft.item.ItemStack;
@@ -35,8 +33,7 @@ public class ItemModelManagerTintMixin {
 					|| displayContext == ItemDisplayContext.THIRD_PERSON_RIGHT_HAND;
 
 			if (isGui || (isHeld && cfg.crossbowTintHeldItem)) {
-				PlayerEntity player = MinecraftClient.getInstance().player;
-				if (player != null && CrossbowGhostState.isGhostStack(player, stack)) {
+				if (CrossbowGhostState.isGhostStack(stack)) {
 					tint = CrossbowGhostState.RED_TINT;
 				} else if (cfg.crossbowGreenWhenLoaded && CrossbowItem.isCharged(stack)) {
 					tint = CrossbowGhostState.GREEN_TINT;
