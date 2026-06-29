@@ -14,7 +14,7 @@ public class FireGhostConfig {
 
 	public boolean flintEnabled = true;
 	public int debounceTicks = 4;
-	public int flintSwapDelayThreshold = 2;
+	public int flintSwapDelayThreshold = 3;
 	public boolean crossbowEnabled = true;
 	public boolean crossbowGreenWhenLoaded = false;
 	public boolean crossbowTintHeldItem = false;
