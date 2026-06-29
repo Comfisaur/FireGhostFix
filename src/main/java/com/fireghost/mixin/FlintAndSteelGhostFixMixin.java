@@ -1,6 +1,7 @@
 package com.fireghost.mixin;
 
 import com.fireghost.FireGhostConfig;
+import com.fireghost.FlintSwapState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
@@ -14,6 +15,7 @@ import net.minecraft.util.math.Direction;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ClientPlayerInteractionManager.class)
@@ -21,6 +23,21 @@ public class FlintAndSteelGhostFixMixin {
 	private BlockPos fireghost$lastFirePos = null;
 	private Direction fireghost$lastSide = null;
 	private long fireghost$lastUseTick = Long.MIN_VALUE;
+
+	@Inject(method = "tick()V", at = @At("HEAD"))
+	private void fireghost$advanceTickAndReplay(CallbackInfo ci) {
+		FlintSwapState.nextTick();
+		if (!FlintSwapState.hasPending()) {
+			return;
+		}
+		ClientPlayerEntity player = MinecraftClient.getInstance().player;
+		Hand hand = FlintSwapState.pendingHand();
+		BlockHitResult hit = FlintSwapState.pendingHit();
+		FlintSwapState.clearPending();
+		if (player != null && hand != null && hit != null) {
+			((ClientPlayerInteractionManager) (Object) this).interactBlock(player, hand, hit);
+		}
+	}
 
 	@Inject(
 			method = "interactBlock(Lnet/minecraft/client/network/ClientPlayerEntity;Lnet/minecraft/util/Hand;Lnet/minecraft/util/hit/BlockHitResult;)Lnet/minecraft/util/ActionResult;",
@@ -33,6 +50,12 @@ public class FlintAndSteelGhostFixMixin {
 			return;
 		}
 		if (!player.getStackInHand(hand).isOf(Items.FLINT_AND_STEEL)) {
+			return;
+		}
+
+		if (FlintSwapState.swapsThisTick() > cfg.flintSwapDelayThreshold) {
+			FlintSwapState.setPending(hand, hitResult);
+			cir.setReturnValue(ActionResult.FAIL);
 			return;
 		}
 

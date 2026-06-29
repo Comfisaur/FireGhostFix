@@ -8,6 +8,7 @@ import net.minecraft.text.Text;
 
 public class FireGhostConfigScreen extends Screen {
 	private static final int MAX_TICKS = 100;
+	private static final int MAX_SWAPS = 9;
 
 	private final Screen parent;
 	private final FireGhostConfig config;
@@ -40,6 +41,7 @@ public class FireGhostConfigScreen extends Screen {
 			}).dimensions(centerX - 100, y, 200, 20).build());
 
 			this.addDrawableChild(new DebounceSlider(centerX - 100, y + 24, 200, 20));
+			this.addDrawableChild(new SwapThresholdSlider(centerX - 100, y + 48, 200, 20));
 		} else {
 			this.addDrawableChild(ButtonWidget.builder(crossbowText(), b -> {
 				config.crossbowEnabled = !config.crossbowEnabled;
@@ -114,6 +116,23 @@ public class FireGhostConfigScreen extends Screen {
 		@Override
 		protected void applyValue() {
 			config.debounceTicks = (int) Math.round(this.value * MAX_TICKS);
+		}
+	}
+
+	private class SwapThresholdSlider extends SliderWidget {
+		SwapThresholdSlider(int x, int y, int width, int height) {
+			super(x, y, width, height, Text.empty(), (double) config.flintSwapDelayThreshold / MAX_SWAPS);
+			this.updateMessage();
+		}
+
+		@Override
+		protected void updateMessage() {
+			this.setMessage(Text.literal("Swap delay above: " + config.flintSwapDelayThreshold + " swaps/tick"));
+		}
+
+		@Override
+		protected void applyValue() {
+			config.flintSwapDelayThreshold = (int) Math.round(this.value * MAX_SWAPS);
 		}
 	}
 }

@@ -17,6 +17,8 @@ A client Mixin debounces repeated ignites on the same block face within a short 
 - Rapid repeats on the same spot are dropped before any prediction or packet is generated.
 - Aiming at a new block resets the debounce instantly, so normal placement is unaffected.
 
+There is a second cause tied to hotbar swap lockouts. Swapping to more than a couple of items in the same tick can cancel the input, so an ignite sent the moment you swap to the flint and steel lands on the wrong item and ghosts. When the number of hotbar swaps in a single tick goes over a threshold (default 2), the ignite is held back and sent on the next tick instead, after the slot has synced. Normal single swaps are not affected.
+
 ## Crossbow loading ghost
 
 In 1.21.11 the loaded state of a crossbow (the charged projectiles component) is set on the server and synced to the client, so a false loaded model cannot appear on its own. The ghost players see is a crossbow that looks like it finished loading but never became charged on the server, so it fires nothing.
@@ -37,6 +39,7 @@ A file is created at `config/fireghost.json` on first launch:
 {
   "flintEnabled": true,
   "debounceTicks": 4,
+  "flintSwapDelayThreshold": 2,
   "crossbowEnabled": true,
   "crossbowGreenWhenLoaded": false,
   "crossbowTintHeldItem": false
@@ -45,6 +48,7 @@ A file is created at `config/fireghost.json` on first launch:
 
 - `flintEnabled`: toggle the flint and steel fix.
 - `debounceTicks`: minimum client ticks between ignites on the same spot (0 to 100). Raise it if you still see flicker on a high latency server, lower it toward 1 for a snappier feel.
+- `flintSwapDelayThreshold`: hold the ignite to the next tick when hotbar swaps in one tick go above this number (0 to 9). Default 2. Set to 0 to delay after any swap in the same tick, set high to effectively turn this off.
 - `crossbowEnabled`: toggle the crossbow ghost detection and red tint.
 - `crossbowGreenWhenLoaded`: tint a confirmed loaded crossbow green.
 - `crossbowTintHeldItem`: also tint the held in world crossbow, not just the hotbar item.
@@ -53,7 +57,7 @@ A file is created at `config/fireghost.json` on first launch:
 
 Mod Menu is optional. When it is installed you can open the config screen from the mods list. The screen has two tabs:
 
-- Fire Ghost: the flint and steel toggle and the debounce slider.
+- Fire Ghost: the flint and steel toggle, the debounce slider, and the swap delay threshold slider.
 - Crossbow Ghost: the crossbow toggle, the green tint toggle, and the held item tint toggle.
 
 Changes are saved to `config/fireghost.json` when you close the screen. Without Mod Menu the mod still works, you just edit the json file directly.
@@ -70,4 +74,4 @@ Requires JDK 21. Point `JAVA_HOME` at a 21 install, then:
 gradlew.bat build
 ```
 
-The finished jar lands in `build/libs/fireghost-1.3.0.jar`. Drop it into your `mods` folder.
+The finished jar lands in `build/libs/fireghost-1.4.0.jar`. Drop it into your `mods` folder.
