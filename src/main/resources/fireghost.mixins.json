@@ -6,7 +6,9 @@
 	"client": [
 		"FlintAndSteelGhostFixMixin",
 		"CrossbowGhostTickMixin",
-		"CrossbowTintMixin"
+		"ItemRenderStateTintMixin",
+		"ItemModelManagerTintMixin",
+		"LayerRenderTintMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

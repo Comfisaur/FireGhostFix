@@ -8,6 +8,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 
 public final class CrossbowGhostState {
+	public static final int RED_TINT = 0xFFFF4040;
+	public static final int GREEN_TINT = 0xFF40FF40;
+
 	private static final int GRACE_TICKS = 10;
 
 	private static int ghostSlot = -1;

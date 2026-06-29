@@ -50,6 +50,11 @@ public class FireGhostConfigScreen extends Screen {
 				config.crossbowGreenWhenLoaded = !config.crossbowGreenWhenLoaded;
 				b.setMessage(greenText());
 			}).dimensions(centerX - 100, y + 24, 200, 20).build());
+
+			this.addDrawableChild(ButtonWidget.builder(heldText(), b -> {
+				config.crossbowTintHeldItem = !config.crossbowTintHeldItem;
+				b.setMessage(heldText());
+			}).dimensions(centerX - 100, y + 48, 200, 20).build());
 		}
 
 		this.addDrawableChild(ButtonWidget.builder(Text.literal("Done"), b -> this.close())
@@ -71,6 +76,10 @@ public class FireGhostConfigScreen extends Screen {
 
 	private Text greenText() {
 		return Text.literal("Green tint when loaded: " + onOff(config.crossbowGreenWhenLoaded));
+	}
+
+	private Text heldText() {
+		return Text.literal("Tint held crossbow: " + onOff(config.crossbowTintHeldItem));
 	}
 
 	private static String onOff(boolean value) {

@@ -16,6 +16,7 @@ public class FireGhostConfig {
 	public int debounceTicks = 4;
 	public boolean crossbowEnabled = true;
 	public boolean crossbowGreenWhenLoaded = false;
+	public boolean crossbowTintHeldItem = false;
 
 	public static FireGhostConfig get() {
 		if (instance == null) {
