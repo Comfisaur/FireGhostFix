@@ -21,6 +21,8 @@ There is a second cause tied to hotbar swap lockouts. Swapping to more than a co
 
 A held ignite is always committed, even if you swap to another hotbar slot before it is sent. The flint and steel slot is remembered when the ignite is held, and on the next tick that slot is briefly reselected so the server places the fire with the flint and steel, then your current slot is restored. The held item you see does not change.
 
+Swapping away from the flint and steel while you are holding right click does not drop the swap, it is held back and applied once the fire placement has been sent, so the placement always lands on the flint and steel first and the swap is never lost. If no placement happens it is applied after a few ticks so it is never stranded.
+
 ## Crossbow loading ghost
 
 In 1.21.11 the loaded state of a crossbow (the charged projectiles component) is set on the server and synced to the client, so a false loaded model cannot appear on its own. The ghost players see is a crossbow that looks like it finished loading but never became charged on the server, so it fires nothing.
@@ -78,4 +80,4 @@ Requires JDK 21. Point `JAVA_HOME` at a 21 install, then:
 gradlew.bat build
 ```
 
-The finished jar lands in `build/libs/fireghost-1.7.0.jar`. Drop it into your `mods` folder.
+The finished jar lands in `build/libs/fireghost-1.8.0.jar`. Drop it into your `mods` folder.

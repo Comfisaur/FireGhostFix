@@ -1,8 +1,8 @@
 package com.fireghost.mixin;
 
 import com.fireghost.CrossbowGhostState;
-import com.fireghost.CrossbowTintHolder;
 import com.fireghost.FireGhostConfig;
+import com.fireghost.LayerTintApplier;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.item.ItemModelManager;
 import net.minecraft.client.render.item.ItemRenderState;
@@ -44,6 +44,6 @@ public class ItemModelManagerTintMixin {
 			}
 		}
 
-		((CrossbowTintHolder) (Object) renderState).fireghost$setTint(tint);
+		((LayerTintApplier) (Object) renderState).fireghost$applyTint(tint);
 	}
 }

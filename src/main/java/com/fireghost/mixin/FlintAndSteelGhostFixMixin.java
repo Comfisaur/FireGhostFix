@@ -28,6 +28,21 @@ public class FlintAndSteelGhostFixMixin {
 	@Inject(method = "tick()V", at = @At("HEAD"))
 	private void fireghost$advanceTickAndReplay(CallbackInfo ci) {
 		FlintSwapState.nextTick();
+
+		if (FlintSwapState.shouldApplyPendingSwap(4)) {
+			ClientPlayerEntity swapPlayer = MinecraftClient.getInstance().player;
+			int swapSlot = FlintSwapState.pendingSwapSlot();
+			FlintSwapState.clearPendingSwap();
+			if (swapPlayer != null && swapSlot >= 0) {
+				FlintSwapState.setReplaying(true);
+				try {
+					swapPlayer.getInventory().setSelectedSlot(swapSlot);
+				} finally {
+					FlintSwapState.setReplaying(false);
+				}
+			}
+		}
+
 		if (!FlintSwapState.hasPending()) {
 			return;
 		}
@@ -102,5 +117,6 @@ public class FlintAndSteelGhostFixMixin {
 		fireghost$lastFirePos = firePos;
 		fireghost$lastSide = side;
 		fireghost$lastUseTick = now;
+		FlintSwapState.markPlacement();
 	}
 }

@@ -13,6 +13,9 @@ public final class FlintSwapState {
 	private static BlockHitResult pendingHit = null;
 	private static int pendingSlot = -1;
 	private static boolean replaying = false;
+	private static int pendingSwapSlot = -1;
+	private static long swapDeferredTick = 0;
+	private static boolean placementSinceDefer = false;
 
 	private FlintSwapState() {
 	}
@@ -72,5 +75,37 @@ public final class FlintSwapState {
 
 	public static void setReplaying(boolean value) {
 		replaying = value;
+	}
+
+	public static void setPendingSwap(int slot) {
+		pendingSwapSlot = slot;
+		swapDeferredTick = clientTick;
+		placementSinceDefer = false;
+	}
+
+	public static boolean hasPendingSwap() {
+		return pendingSwapSlot >= 0;
+	}
+
+	public static int pendingSwapSlot() {
+		return pendingSwapSlot;
+	}
+
+	public static void clearPendingSwap() {
+		pendingSwapSlot = -1;
+		placementSinceDefer = false;
+	}
+
+	public static void markPlacement() {
+		if (pendingSwapSlot >= 0) {
+			placementSinceDefer = true;
+		}
+	}
+
+	public static boolean shouldApplyPendingSwap(long maxHoldTicks) {
+		if (pendingSwapSlot < 0) {
+			return false;
+		}
+		return placementSinceDefer || clientTick - swapDeferredTick >= maxHoldTicks;
 	}
 }

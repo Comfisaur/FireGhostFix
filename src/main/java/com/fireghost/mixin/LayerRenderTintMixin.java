@@ -1,6 +1,6 @@
 package com.fireghost.mixin;
 
-import com.fireghost.TintContext;
+import com.fireghost.CrossbowTintHolder;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.client.render.RenderLayer;
@@ -10,13 +10,27 @@ import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemDisplayContext;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Mixin(targets = "net.minecraft.client.render.item.ItemRenderState$LayerRenderState")
-public abstract class LayerRenderTintMixin {
+public abstract class LayerRenderTintMixin implements CrossbowTintHolder {
+	@Unique
+	private int fireghost$tint = 0;
+
+	@Override
+	public int fireghost$getTint() {
+		return this.fireghost$tint;
+	}
+
+	@Override
+	public void fireghost$setTint(int color) {
+		this.fireghost$tint = color;
+	}
+
 	@WrapOperation(
 			method = "render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/command/OrderedRenderCommandQueue;III)V",
 			at = @At(
@@ -25,7 +39,7 @@ public abstract class LayerRenderTintMixin {
 			)
 	)
 	private void fireghost$tintItem(OrderedRenderCommandQueue queue, MatrixStack matrices, ItemDisplayContext context, int light, int overlay, int outlineColor, int[] tints, List<BakedQuad> quads, RenderLayer renderLayer, ItemRenderState.Glint glint, Operation<Void> original) {
-		int tint = TintContext.active;
+		int tint = this.fireghost$tint;
 		if (tint != 0 && !quads.isEmpty()) {
 			List<BakedQuad> recoloured = new ArrayList<>(quads.size());
 			for (BakedQuad quad : quads) {
