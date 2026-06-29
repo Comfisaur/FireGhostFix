@@ -45,4 +45,4 @@ Requires JDK 21. Point `JAVA_HOME` at a 21 install, then:
 gradlew.bat build
 ```
 
-The finished jar lands in `build/libs/fireghost-1.0.0.jar`. Drop it into your `mods` folder.
+The finished jar lands in `build/libs/fireghost-1.1.0.jar`. Drop it into your `mods` folder.
