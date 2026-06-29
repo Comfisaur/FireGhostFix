@@ -17,7 +17,7 @@ A client Mixin debounces repeated ignites on the same block face within a short 
 - Rapid repeats on the same spot are dropped before any prediction or packet is generated.
 - Aiming at a new block resets the debounce instantly, so normal placement is unaffected.
 
-There is a second cause tied to hotbar swap lockouts. Swapping to more than a couple of items in the same tick can cancel the input, so an ignite sent the moment you swap to the flint and steel lands on the wrong item and ghosts. When the number of hotbar swaps in a single tick goes over a threshold (default 3), the ignite is held back and sent on the next tick instead, after the slot has synced. Normal single swaps are not affected.
+There is a second cause tied to hotbar swap lockouts. Swapping to more than a couple of items in the same tick can cancel the input, so an ignite sent the moment you swap to the flint and steel lands on the wrong item and ghosts. When the number of hotbar swaps in a single tick goes over a threshold (default 3), the ignite is held back and sent on the next tick instead, after the slot has synced. The same hold also kicks in when an ignite lands within a few milliseconds of a swap (default 5 ms), which catches clicking at the exact moment you swap to the flint and steel. Because cross tick gaps are about 50 ms, this only triggers on a true simultaneous swap and click, so normal play where you swap and then click a moment later is not affected.
 
 ## Crossbow loading ghost
 
@@ -40,6 +40,7 @@ A file is created at `config/fireghost.json` on first launch:
   "flintEnabled": true,
   "debounceTicks": 4,
   "flintSwapDelayThreshold": 3,
+  "flintSwapWindowMillis": 5,
   "crossbowEnabled": true,
   "crossbowGreenWhenLoaded": false,
   "crossbowTintHeldItem": false
@@ -49,6 +50,7 @@ A file is created at `config/fireghost.json` on first launch:
 - `flintEnabled`: toggle the flint and steel fix.
 - `debounceTicks`: minimum client ticks between ignites on the same spot (0 to 100). Raise it if you still see flicker on a high latency server, lower it toward 1 for a snappier feel.
 - `flintSwapDelayThreshold`: hold the ignite to the next tick when hotbar swaps in one tick go above this number (0 to 9). Default 3. Set to 0 to delay after any swap in the same tick, set high to effectively turn this off.
+- `flintSwapWindowMillis`: also hold the ignite to the next tick when it lands within this many milliseconds of a swap (0 to 1000). Default 5. Set to 0 to turn this off.
 - `crossbowEnabled`: toggle the crossbow ghost detection and red tint.
 - `crossbowGreenWhenLoaded`: tint a confirmed loaded crossbow green.
 - `crossbowTintHeldItem`: also tint the held in world crossbow, not just the hotbar item.
@@ -74,4 +76,4 @@ Requires JDK 21. Point `JAVA_HOME` at a 21 install, then:
 gradlew.bat build
 ```
 
-The finished jar lands in `build/libs/fireghost-1.5.0.jar`. Drop it into your `mods` folder.
+The finished jar lands in `build/libs/fireghost-1.6.0.jar`. Drop it into your `mods` folder.

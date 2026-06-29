@@ -7,6 +7,7 @@ public final class FlintSwapState {
 	private static long clientTick = 0;
 	private static long swapTick = -1;
 	private static int swapCount = 0;
+	private static long lastSwapMillis = Long.MIN_VALUE;
 
 	private static Hand pendingHand = null;
 	private static BlockHitResult pendingHit = null;
@@ -24,10 +25,15 @@ public final class FlintSwapState {
 			swapCount = 0;
 		}
 		swapCount++;
+		lastSwapMillis = System.currentTimeMillis();
 	}
 
 	public static int swapsThisTick() {
 		return swapTick == clientTick ? swapCount : 0;
+	}
+
+	public static boolean swappedWithinMillis(long windowMillis) {
+		return System.currentTimeMillis() - lastSwapMillis <= windowMillis;
 	}
 
 	public static void setPending(Hand hand, BlockHitResult hit) {

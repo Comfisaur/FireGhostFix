@@ -53,7 +53,8 @@ public class FlintAndSteelGhostFixMixin {
 			return;
 		}
 
-		if (FlintSwapState.swapsThisTick() > cfg.flintSwapDelayThreshold) {
+		if (FlintSwapState.swapsThisTick() > cfg.flintSwapDelayThreshold
+				|| FlintSwapState.swappedWithinMillis(cfg.flintSwapWindowMillis)) {
 			FlintSwapState.setPending(hand, hitResult);
 			cir.setReturnValue(ActionResult.FAIL);
 			return;
