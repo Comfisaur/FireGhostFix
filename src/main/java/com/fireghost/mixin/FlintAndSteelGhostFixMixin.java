@@ -29,7 +29,7 @@ public class FlintAndSteelGhostFixMixin {
 	)
 	private void fireghost$debounceFlintAndSteel(ClientPlayerEntity player, Hand hand, BlockHitResult hitResult, CallbackInfoReturnable<ActionResult> cir) {
 		FireGhostConfig cfg = FireGhostConfig.get();
-		if (!cfg.enabled || player == null || hitResult == null) {
+		if (!cfg.flintEnabled || player == null || hitResult == null) {
 			return;
 		}
 		if (!player.getStackInHand(hand).isOf(Items.FLINT_AND_STEEL)) {

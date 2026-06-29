@@ -3,7 +3,7 @@
 	"id": "fireghost",
 	"version": "${version}",
 	"name": "FireGhostFix",
-	"description": "Fixes flint and steel fire ghosting when you right click too fast by debouncing rapid client side ignite predictions that desync from the server.",
+	"description": "Fixes flint and steel fire ghosting when you right click too fast by debouncing rapid client side ignite predictions that desync from the server.\n\nAlso detects crossbow loading ghosts, where the client shows a crossbow as loaded but the server never confirmed it, and tints the hotbar crossbow red until it actually loads. An optional green tint marks a confirmed loaded crossbow.",
 	"authors": [
 		"Comfi"
 	],

@@ -11,6 +11,6 @@ public class FireGhost implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
 		FireGhostConfig cfg = FireGhostConfig.get();
-		LOGGER.info("[FireGhostFix] active, enabled={}, debounce={} ticks", cfg.enabled, cfg.debounceTicks);
+		LOGGER.info("[FireGhostFix] active, flint={}, crossbow={}", cfg.flintEnabled, cfg.crossbowEnabled);
 	}
 }

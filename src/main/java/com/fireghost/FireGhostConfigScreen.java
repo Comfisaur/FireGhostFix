@@ -11,6 +11,7 @@ public class FireGhostConfigScreen extends Screen {
 
 	private final Screen parent;
 	private final FireGhostConfig config;
+	private int tab = 0;
 
 	public FireGhostConfigScreen(Screen parent) {
 		super(Text.literal("FireGhostFix"));
@@ -21,27 +22,65 @@ public class FireGhostConfigScreen extends Screen {
 	@Override
 	protected void init() {
 		int centerX = this.width / 2;
-		int centerY = this.height / 2;
 
-		this.addDrawableChild(ButtonWidget.builder(toggleText(), button -> {
-			config.enabled = !config.enabled;
-			button.setMessage(toggleText());
-		}).dimensions(centerX - 100, centerY - 24, 200, 20).build());
+		ButtonWidget fireTab = ButtonWidget.builder(Text.literal("Fire Ghost"), b -> selectTab(0))
+				.dimensions(centerX - 102, 28, 100, 20).build();
+		ButtonWidget crossbowTab = ButtonWidget.builder(Text.literal("Crossbow Ghost"), b -> selectTab(1))
+				.dimensions(centerX + 2, 28, 100, 20).build();
+		fireTab.active = tab != 0;
+		crossbowTab.active = tab != 1;
+		this.addDrawableChild(fireTab);
+		this.addDrawableChild(crossbowTab);
 
-		this.addDrawableChild(new DebounceSlider(centerX - 100, centerY, 200, 20));
+		int y = 70;
+		if (tab == 0) {
+			this.addDrawableChild(ButtonWidget.builder(flintText(), b -> {
+				config.flintEnabled = !config.flintEnabled;
+				b.setMessage(flintText());
+			}).dimensions(centerX - 100, y, 200, 20).build());
 
-		this.addDrawableChild(ButtonWidget.builder(Text.literal("Done"), button -> this.close())
-				.dimensions(centerX - 100, centerY + 24, 200, 20).build());
+			this.addDrawableChild(new DebounceSlider(centerX - 100, y + 24, 200, 20));
+		} else {
+			this.addDrawableChild(ButtonWidget.builder(crossbowText(), b -> {
+				config.crossbowEnabled = !config.crossbowEnabled;
+				b.setMessage(crossbowText());
+			}).dimensions(centerX - 100, y, 200, 20).build());
+
+			this.addDrawableChild(ButtonWidget.builder(greenText(), b -> {
+				config.crossbowGreenWhenLoaded = !config.crossbowGreenWhenLoaded;
+				b.setMessage(greenText());
+			}).dimensions(centerX - 100, y + 24, 200, 20).build());
+		}
+
+		this.addDrawableChild(ButtonWidget.builder(Text.literal("Done"), b -> this.close())
+				.dimensions(centerX - 100, this.height - 32, 200, 20).build());
 	}
 
-	private Text toggleText() {
-		return Text.literal("Fix: " + (config.enabled ? "Enabled" : "Disabled"));
+	private void selectTab(int t) {
+		this.tab = t;
+		this.clearAndInit();
+	}
+
+	private Text flintText() {
+		return Text.literal("Flint and Steel fix: " + onOff(config.flintEnabled));
+	}
+
+	private Text crossbowText() {
+		return Text.literal("Crossbow ghost fix: " + onOff(config.crossbowEnabled));
+	}
+
+	private Text greenText() {
+		return Text.literal("Green tint when loaded: " + onOff(config.crossbowGreenWhenLoaded));
+	}
+
+	private static String onOff(boolean value) {
+		return value ? "ON" : "OFF";
 	}
 
 	@Override
 	public void render(DrawContext context, int mouseX, int mouseY, float delta) {
 		super.render(context, mouseX, mouseY, delta);
-		context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, this.height / 2 - 52, 0xFFFFFF);
+		context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 12, 0xFFFFFF);
 	}
 
 	@Override

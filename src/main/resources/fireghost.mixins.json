@@ -4,7 +4,9 @@
 	"package": "com.fireghost.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"client": [
-		"FlintAndSteelGhostFixMixin"
+		"FlintAndSteelGhostFixMixin",
+		"CrossbowGhostTickMixin",
+		"CrossbowTintMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

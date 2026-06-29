@@ -12,8 +12,10 @@ public class FireGhostConfig {
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 	private static FireGhostConfig instance;
 
-	public boolean enabled = true;
+	public boolean flintEnabled = true;
 	public int debounceTicks = 4;
+	public boolean crossbowEnabled = true;
+	public boolean crossbowGreenWhenLoaded = false;
 
 	public static FireGhostConfig get() {
 		if (instance == null) {
