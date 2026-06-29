@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class PlayerInventorySwapMixin {
 	@Inject(method = "setSelectedSlot(I)V", at = @At("HEAD"))
 	private void fireghost$countSwap(int slot, CallbackInfo ci) {
-		if (!FireGhostConfig.get().flintEnabled) {
+		if (!FireGhostConfig.get().flintEnabled || FlintSwapState.isReplaying()) {
 			return;
 		}
 		PlayerInventory self = (PlayerInventory) (Object) this;

@@ -19,6 +19,8 @@ A client Mixin debounces repeated ignites on the same block face within a short 
 
 There is a second cause tied to hotbar swap lockouts. Swapping to more than a couple of items in the same tick can cancel the input, so an ignite sent the moment you swap to the flint and steel lands on the wrong item and ghosts. When the number of hotbar swaps in a single tick goes over a threshold (default 3), the ignite is held back and sent on the next tick instead, after the slot has synced. The same hold also kicks in when an ignite lands within a few milliseconds of a swap (default 5 ms), which catches clicking at the exact moment you swap to the flint and steel. Because cross tick gaps are about 50 ms, this only triggers on a true simultaneous swap and click, so normal play where you swap and then click a moment later is not affected.
 
+A held ignite is always committed, even if you swap to another hotbar slot before it is sent. The flint and steel slot is remembered when the ignite is held, and on the next tick that slot is briefly reselected so the server places the fire with the flint and steel, then your current slot is restored. The held item you see does not change.
+
 ## Crossbow loading ghost
 
 In 1.21.11 the loaded state of a crossbow (the charged projectiles component) is set on the server and synced to the client, so a false loaded model cannot appear on its own. The ghost players see is a crossbow that looks like it finished loading but never became charged on the server, so it fires nothing.
@@ -76,4 +78,4 @@ Requires JDK 21. Point `JAVA_HOME` at a 21 install, then:
 gradlew.bat build
 ```
 
-The finished jar lands in `build/libs/fireghost-1.6.0.jar`. Drop it into your `mods` folder.
+The finished jar lands in `build/libs/fireghost-1.7.0.jar`. Drop it into your `mods` folder.

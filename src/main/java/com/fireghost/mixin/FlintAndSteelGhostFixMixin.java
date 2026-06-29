@@ -6,6 +6,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Items;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -33,9 +34,29 @@ public class FlintAndSteelGhostFixMixin {
 		ClientPlayerEntity player = MinecraftClient.getInstance().player;
 		Hand hand = FlintSwapState.pendingHand();
 		BlockHitResult hit = FlintSwapState.pendingHit();
+		int slot = FlintSwapState.pendingSlot();
 		FlintSwapState.clearPending();
-		if (player != null && hand != null && hit != null) {
-			((ClientPlayerInteractionManager) (Object) this).interactBlock(player, hand, hit);
+		if (player == null || hand == null || hit == null) {
+			return;
+		}
+
+		ClientPlayerInteractionManager self = (ClientPlayerInteractionManager) (Object) this;
+		PlayerInventory inventory = player.getInventory();
+		int current = inventory.getSelectedSlot();
+		boolean reselect = hand == Hand.MAIN_HAND && slot >= 0 && slot != current
+				&& inventory.getStack(slot).isOf(Items.FLINT_AND_STEEL);
+
+		FlintSwapState.setReplaying(true);
+		try {
+			if (reselect) {
+				inventory.setSelectedSlot(slot);
+				self.interactBlock(player, hand, hit);
+				inventory.setSelectedSlot(current);
+			} else {
+				self.interactBlock(player, hand, hit);
+			}
+		} finally {
+			FlintSwapState.setReplaying(false);
 		}
 	}
 
@@ -53,9 +74,10 @@ public class FlintAndSteelGhostFixMixin {
 			return;
 		}
 
-		if (FlintSwapState.swapsThisTick() > cfg.flintSwapDelayThreshold
-				|| FlintSwapState.swappedWithinMillis(cfg.flintSwapWindowMillis)) {
-			FlintSwapState.setPending(hand, hitResult);
+		if (!FlintSwapState.isReplaying()
+				&& (FlintSwapState.swapsThisTick() > cfg.flintSwapDelayThreshold
+				|| FlintSwapState.swappedWithinMillis(cfg.flintSwapWindowMillis))) {
+			FlintSwapState.setPending(hand, hitResult, player.getInventory().getSelectedSlot());
 			cir.setReturnValue(ActionResult.FAIL);
 			return;
 		}

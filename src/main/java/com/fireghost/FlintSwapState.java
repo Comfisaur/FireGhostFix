@@ -11,6 +11,8 @@ public final class FlintSwapState {
 
 	private static Hand pendingHand = null;
 	private static BlockHitResult pendingHit = null;
+	private static int pendingSlot = -1;
+	private static boolean replaying = false;
 
 	private FlintSwapState() {
 	}
@@ -36,9 +38,10 @@ public final class FlintSwapState {
 		return System.currentTimeMillis() - lastSwapMillis <= windowMillis;
 	}
 
-	public static void setPending(Hand hand, BlockHitResult hit) {
+	public static void setPending(Hand hand, BlockHitResult hit, int slot) {
 		pendingHand = hand;
 		pendingHit = hit;
+		pendingSlot = slot;
 	}
 
 	public static boolean hasPending() {
@@ -53,8 +56,21 @@ public final class FlintSwapState {
 		return pendingHit;
 	}
 
+	public static int pendingSlot() {
+		return pendingSlot;
+	}
+
 	public static void clearPending() {
 		pendingHand = null;
 		pendingHit = null;
+		pendingSlot = -1;
+	}
+
+	public static boolean isReplaying() {
+		return replaying;
+	}
+
+	public static void setReplaying(boolean value) {
+		replaying = value;
 	}
 }
