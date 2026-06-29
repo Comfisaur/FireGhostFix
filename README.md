@@ -33,6 +33,15 @@ A file is created at `config/fireghost.json` on first launch:
 - `enabled`: master toggle.
 - `debounceTicks`: minimum client ticks between ignites on the same spot (0 to 100). Raise it if you still see flicker on a high latency server, lower it toward 1 for a snappier feel.
 
+## Mod Menu
+
+Mod Menu is optional. When it is installed you can open the config screen from the mods list and change both settings in game:
+
+- An enable and disable toggle for the fix.
+- A debounce slider for the tick window (0 to 100).
+
+Changes are saved to `config/fireghost.json` when you close the screen. Without Mod Menu the mod still works, you just edit the json file directly.
+
 ## Building
 
 Requires JDK 21. Point `JAVA_HOME` at a 21 install, then:
