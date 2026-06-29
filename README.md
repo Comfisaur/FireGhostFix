@@ -9,19 +9,11 @@ A client side Fabric mod that fixes two desync ghosts: flint and steel ghost fir
 
 ## Flint and steel ghost fire
 
-Every right click runs the client's `interactBlock`, which predicts a fire block on your screen and sends an interact packet to the server. When you spam click faster than the server can acknowledge, multiple predictions pile up on the same spot. The client guess and the server state diverge and the predicted fire flickers.
+The ghost happens because the client places the fire as a local prediction the instant you click, before the server has confirmed it. If the server does not end up placing that exact fire, the prediction is left behind as a ghost block. It looks placed but it is not really there, and it only disappears later when a block update reaches it, for example when an arrow flies through it or you interact with that spot.
 
-A client Mixin debounces repeated ignites on the same block face within a short window (default 4 ticks, about 0.2 seconds):
+This fix removes the prediction for flint and steel. The interact packet is still sent to the server exactly as normal, but the client no longer pre places the fire itself. The only fire you see is the real one the server places and sends back, so there is no prediction to revert and nothing to ghost. Valid placements become real fire that stays.
 
-- The first click of a burst goes through normally.
-- Rapid repeats on the same spot are dropped before any prediction or packet is generated.
-- Aiming at a new block resets the debounce instantly, so normal placement is unaffected.
-
-There is a second cause tied to hotbar swap lockouts. Swapping to more than a couple of items in the same tick can cancel the input, so an ignite sent the moment you swap to the flint and steel lands on the wrong item and ghosts. When the number of hotbar swaps in a single tick goes over a threshold (default 3), the ignite is held back and sent on the next tick instead, after the slot has synced. The same hold also kicks in when an ignite lands within a few milliseconds of a swap (default 5 ms), which catches clicking at the exact moment you swap to the flint and steel. Because cross tick gaps are about 50 ms, this only triggers on a true simultaneous swap and click, so normal play where you swap and then click a moment later is not affected.
-
-A held ignite is always committed, even if you swap to another hotbar slot before it is sent. The flint and steel slot is remembered when the ignite is held, and on the next tick that slot is briefly reselected so the server places the fire with the flint and steel, then your current slot is restored. The held item you see does not change.
-
-Swapping away from the flint and steel while you are holding right click does not drop the swap, it is held back and applied once the fire placement has been sent, so the placement always lands on the flint and steel first and the swap is never lost. If no placement happens it is applied after a few ticks so it is never stranded.
+A short debounce is also kept (default 4 ticks, about 0.2 seconds) so spamming the same spot does not send a burst of duplicate ignites. Aiming at a new block resets it instantly, so normal placement is unaffected.
 
 ## Crossbow loading ghost
 
@@ -43,8 +35,7 @@ A file is created at `config/fireghost.json` on first launch:
 {
   "flintEnabled": true,
   "debounceTicks": 4,
-  "flintSwapDelayThreshold": 3,
-  "flintSwapWindowMillis": 5,
+  "flintPreventGhost": true,
   "crossbowEnabled": true,
   "crossbowGreenWhenLoaded": false,
   "crossbowTintHeldItem": false
@@ -53,8 +44,7 @@ A file is created at `config/fireghost.json` on first launch:
 
 - `flintEnabled`: toggle the flint and steel fix.
 - `debounceTicks`: minimum client ticks between ignites on the same spot (0 to 100). Raise it if you still see flicker on a high latency server, lower it toward 1 for a snappier feel.
-- `flintSwapDelayThreshold`: hold the ignite to the next tick when hotbar swaps in one tick go above this number (0 to 9). Default 3. Set to 0 to delay after any swap in the same tick, set high to effectively turn this off.
-- `flintSwapWindowMillis`: also hold the ignite to the next tick when it lands within this many milliseconds of a swap (0 to 1000). Default 5. Set to 0 to turn this off.
+- `flintPreventGhost`: remove the client side fire prediction so only the server confirmed fire is shown and nothing ghosts. On a high latency server the fire appears a little later because it waits for the server.
 - `crossbowEnabled`: toggle the crossbow ghost detection and red tint.
 - `crossbowGreenWhenLoaded`: tint a confirmed loaded crossbow green.
 - `crossbowTintHeldItem`: also tint the held in world crossbow, not just the hotbar item.
@@ -63,7 +53,7 @@ A file is created at `config/fireghost.json` on first launch:
 
 Mod Menu is optional. When it is installed you can open the config screen from the mods list. The screen has two tabs:
 
-- Fire Ghost: the flint and steel toggle and the debounce slider.
+- Fire Ghost: the flint and steel toggle, the debounce slider, and the prevent ghost fire toggle.
 - Crossbow Ghost: the crossbow toggle, the green tint toggle, and the held item tint toggle.
 
 Changes are saved to `config/fireghost.json` when you close the screen. Without Mod Menu the mod still works, you just edit the json file directly.
@@ -80,4 +70,4 @@ Requires JDK 21. Point `JAVA_HOME` at a 21 install, then:
 gradlew.bat build
 ```
 
-The finished jar lands in `build/libs/fireghost-1.8.0.jar`. Drop it into your `mods` folder.
+The finished jar lands in `build/libs/fireghost-1.9.0.jar`. Drop it into your `mods` folder.

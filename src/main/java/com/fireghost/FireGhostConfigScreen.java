@@ -40,6 +40,11 @@ public class FireGhostConfigScreen extends Screen {
 			}).dimensions(centerX - 100, y, 200, 20).build());
 
 			this.addDrawableChild(new DebounceSlider(centerX - 100, y + 24, 200, 20));
+
+			this.addDrawableChild(ButtonWidget.builder(preventGhostText(), b -> {
+				config.flintPreventGhost = !config.flintPreventGhost;
+				b.setMessage(preventGhostText());
+			}).dimensions(centerX - 100, y + 48, 200, 20).build());
 		} else {
 			this.addDrawableChild(ButtonWidget.builder(crossbowText(), b -> {
 				config.crossbowEnabled = !config.crossbowEnabled;
@@ -68,6 +73,10 @@ public class FireGhostConfigScreen extends Screen {
 
 	private Text flintText() {
 		return Text.literal("Flint and Steel fix: " + onOff(config.flintEnabled));
+	}
+
+	private Text preventGhostText() {
+		return Text.literal("Prevent ghost fire: " + onOff(config.flintPreventGhost));
 	}
 
 	private Text crossbowText() {
