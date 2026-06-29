@@ -1,0 +1,12 @@
+{
+	"required": true,
+	"minVersion": "0.8",
+	"package": "com.fireghost.mixin",
+	"compatibilityLevel": "JAVA_21",
+	"client": [
+		"FlintAndSteelGhostFixMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}
